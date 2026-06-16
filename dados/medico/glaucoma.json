@@ -1,0 +1,23 @@
+[
+  {
+    "id": "gla-001",
+    "titulo": "O que é o glaucoma?",
+    "conteudo": "O glaucoma é uma doença ocular crónica que danifica o nervo ótico, geralmente associada ao aumento da pressão intraocular. É uma das principais causas de cegueira irreversível no mundo. Pode ser assintomático nas fases iniciais.",
+    "fonte": "Sociedade Portuguesa de Oftalmologia",
+    "categoria": "definicao"
+  },
+  {
+    "id": "gla-002",
+    "titulo": "Tipos de glaucoma",
+    "conteudo": "Os principais tipos são: glaucoma de ângulo aberto (o mais comum, crónico), glaucoma de ângulo fechado (agudo, emergência médica), glaucoma congénito (presente ao nascimento) e glaucoma secundário (causado por outras doenças ou medicamentos).",
+    "fonte": "Sociedade Portuguesa de Oftalmologia",
+    "categoria": "tipos"
+  },
+  {
+    "id": "gla-003",
+    "titulo": "Fatores de risco",
+    "conteudo": "Idade superior a 40 anos, história familiar de glaucoma, pressão intraocular elevada, miopia elevada, diabetes e hipertensão arterial são fatores de risco importantes para o desenvolvimento do glaucoma.",
+    "fonte": "Sociedade Portuguesa de Oftalmologia",
+    "categoria": "riscos"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "equi-001",
+    "titulo": "Corpo clínico",
+    "conteudo": "A nossa equipa é liderada pelo Dr. João Silva (Diretor Clínico, especialista em retina), Dra. Maria Santos (especialista em glaucoma e catarata), Dra. Ana Costa (oftalmopediatria), Dr. Pedro Oliveira (córnea e cirurgia refrativa) e Dra. Sara Almeida (oculoplástica).",
+    "fonte": "Site",
+    "categoria": "medicos"
+  },
+  {
+    "id": "equi-002",
+    "titulo": "Diferenciação da equipa",
+    "conteudo": "Todos os nossos médicos têm formação em instituições de referência nacionais e internacionais, e participam regularmente em congressos e formações contínuas.",
+    "fonte": "Site",
+    "categoria": "qualidade"
+  }
+]

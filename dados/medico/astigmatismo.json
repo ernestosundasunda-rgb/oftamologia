@@ -1,0 +1,16 @@
+[
+  {
+    "id": "ast-001",
+    "titulo": "O que é o astigmatismo?",
+    "conteudo": "O astigmatismo é um erro refrativo causado por uma curvatura irregular da córnea ou do cristalino, que faz com que a luz se foque em vários pontos da retina, provocando visão distorcida ou desfocada tanto para longe como para perto.",
+    "fonte": "Sociedade Portuguesa de Oftalmologia",
+    "categoria": "definicao"
+  },
+  {
+    "id": "ast-002",
+    "titulo": "Correção do astigmatismo",
+    "conteudo": "Pode ser corrigido com óculos de lentes cilíndricas, lentes de contacto tóricas ou cirurgia refrativa (LASIK, PRK). O tratamento depende do grau de astigmatismo e da espessura corneana.",
+    "fonte": "Sociedade Portuguesa de Oftalmologia",
+    "categoria": "tratamento"
+  }
+]

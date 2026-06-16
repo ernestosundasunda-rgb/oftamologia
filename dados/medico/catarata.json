@@ -1,0 +1,23 @@
+[
+  {
+    "id": "cat-001",
+    "titulo": "O que é a catarata?",
+    "conteudo": "A catarata é a opacificação do cristalino, a lente natural do olho, que leva à diminuição progressiva da visão. É a principal causa de cegueira reversível no mundo e afeta sobretudo pessoas com mais de 60 anos.",
+    "fonte": "Sociedade Portuguesa de Oftalmologia",
+    "categoria": "definicao"
+  },
+  {
+    "id": "cat-002",
+    "titulo": "Sintomas da catarata",
+    "conteudo": "Os sintomas incluem visão turva ou enevoada, sensibilidade à luz (fotofobia), dificuldade para conduzir à noite, ver halos em volta das luzes, necessidade de luz mais forte para ler, alteração frequente da graduação dos óculos e cores desbotadas ou amareladas.",
+    "fonte": "Sociedade Portuguesa de Oftalmologia",
+    "categoria": "sintomas"
+  },
+  {
+    "id": "cat-003",
+    "titulo": "Tratamento da catarata",
+    "conteudo": "O tratamento é cirúrgico. A cirurgia consiste na remoção do cristalino opaco e substituição por uma lente intraocular. É um procedimento seguro e eficaz. Não existem medicamentos ou colírios que eliminem a catarata.",
+    "fonte": "Sociedade Portuguesa de Oftalmologia",
+    "categoria": "tratamento"
+  }
+]

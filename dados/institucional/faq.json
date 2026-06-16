@@ -1,0 +1,44 @@
+[
+  {
+    "id": "faq-001",
+    "titulo": "Horário de funcionamento",
+    "conteudo": "O Centro Oftalmológico funciona de segunda a sexta-feira das 8h00 às 16h00, e aos sábados das 9h00 às 13h00. Encerra aos domingos e feriados.",
+    "fonte": "Portal do centro",
+    "categoria": "horarios"
+  },
+  {
+    "id": "faq-002",
+    "titulo": "Marcação de consultas",
+    "conteudo": "Pode marcar consulta pelo telefone +244 934 567 890, pelo nosso site oficial  ou diretamente na receção. Recomenda-se marcação prévia com pelo menos 48h de antecedência. Para urgências, não é necessário agendamento.",
+    "fonte": "FAQ",
+    "categoria": "marcacoes"
+  },
+  {
+    "id": "faq-003",
+    "titulo": "Documentos necessários para a consulta",
+    "conteudo": "Traga o seu cartão de cidadão, cartão de utente do SNS ou seguro de saúde, e exames oftalmológicos anteriores (se os tiver). Se usa óculos ou lentes de contacto, leve-os consigo.",
+    "fonte": "FAQ",
+    "categoria": "documentacao"
+  },
+  {
+    "id": "faq-004",
+    "titulo": "Aceitam seguros de saúde?",
+    "conteudo": "Sim, trabalhamos com a maioria dos seguros de saúde em Portugal, incluindo Multicare, AdvanceCare, Médis, Allianz, entre outros. Consulte-nos para confirmar se o seu seguro é aceite.",
+    "fonte": "FAQ",
+    "categoria": "seguros"
+  },
+  {
+    "id": "faq-005",
+    "titulo": "Tempo médio de consulta",
+    "conteudo": "Uma consulta de rotina tem duração média de 30 a 45 minutos. Exames complementares podem aumentar esse tempo. A primeira consulta costuma ser mais demorada devido à avaliação inicial completa.",
+    "fonte": "FAQ",
+    "categoria": "informacao"
+  },
+  {
+    "id": "faq-006",
+    "titulo": "Cancelamento ou reagendamento",
+    "conteudo": "Pode cancelar ou reagendar a sua consulta até 24h antes do horário marcado, sem qualquer custo. Cancelamentos tardios ou faltas podem ter uma taxa associada.",
+    "fonte": "FAQ",
+    "categoria": "marcacoes"
+  }
+]
