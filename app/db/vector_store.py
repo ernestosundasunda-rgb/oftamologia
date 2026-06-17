@@ -1,5 +1,5 @@
 """
-Busca vetorial personalizada com bónus de similaridade por correspondência no título.
+Busca vetorial híbrida: similaridade + prioridade absoluta por correspondência exata no título.
 """
 from typing import List, Optional
 from langchain_core.documents import Document
@@ -9,15 +9,16 @@ from app.core.embeddings import criar_embeddings
 
 embeddings = criar_embeddings()
 
-def _titulo_bonus(titulo: str, query: str) -> float:
-    """Retorna um pequeno bónus (0.05) se alguma palavra da query aparecer no título."""
+def _match_titulo_exato(titulo: str, query: str) -> bool:
+    """Retorna True se ≥80% das palavras da query estão no título."""
     if not titulo:
-        return 0.0
+        return False
     palavras_query = set(query.lower().split())
     palavras_titulo = set(titulo.lower().split())
-    if palavras_query & palavras_titulo:
-        return 0.05
-    return 0.0
+    if not palavras_query:
+        return False
+    intersecao = palavras_query & palavras_titulo
+    return len(intersecao) >= len(palavras_query) * 0.8
 
 def buscar_documentos(
     query: str,
@@ -41,19 +42,21 @@ def buscar_documentos(
         ).execute()
 
         if not resultado.data:
-            logger.info(f"Nenhum documento encontrado para a query: '{query}'")
+            logger.info(f"Nenhum documento encontrado para: '{query}'")
             return []
 
         docs = []
         for item in resultado.data:
             similarity = item.get("similarity", 0)
-            # Bónus por correspondência no título
             titulo = item["metadata"].get("titulo", "")
-            bonus = _titulo_bonus(titulo, query)
-            similarity += bonus
-
             doc_id = item["metadata"].get("doc_id", "?")
-            logger.info(f"Doc: {doc_id} | Sim: {similarity:.4f} (bónus: {bonus}) | Título: {titulo}")
+
+            # Prioridade absoluta se o título corresponder exatamente à query
+            if _match_titulo_exato(titulo, query):
+                similarity = 2.0
+                logger.info(f"Doc: {doc_id} | ⚡ Prioridade absoluta por título: {titulo}")
+            else:
+                logger.info(f"Doc: {doc_id} | Sim: {similarity:.4f} | Título: {titulo}")
 
             if similarity >= threshold:
                 doc = Document(
@@ -63,7 +66,6 @@ def buscar_documentos(
                 doc.metadata["similarity"] = similarity
                 docs.append(doc)
 
-        # Reordenar pela similaridade ajustada
         docs.sort(key=lambda d: d.metadata.get("similarity", 0), reverse=True)
         return docs
 

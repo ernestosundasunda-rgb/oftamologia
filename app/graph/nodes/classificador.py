@@ -1,50 +1,38 @@
 """
-Nó 3 – Classificador de intenções (3 rotas) com blindagem anti‑falsas saudações
+Classificador determinístico. A LLM não é usada.
 """
-import traceback
-from loguru import logger
-from langchain_core.prompts import ChatPromptTemplate
-from app.graph.state import AgenteState, DecisaoRota
-from app.core.llm import criar_llm
+from app.graph.state import AgenteState
 
-llm = criar_llm(temperature=0.0).with_structured_output(DecisaoRota, method="json_mode")
+# Conjuntos de palavras
+SAUDACAO_PURAS = {"olá", "oi", "bom dia", "boa tarde", "boa noite", "adeus", "tchau", "obrigado", "obrigada", "até logo"}
+FORA_ESCOPO = {"futebol", "política", "carros", "receita", "bolo", "clima", "jogo", "campeonato", "programação", "finanças", "ciclismo"}
+INFORMATIVAS = {
+    "horário", "consulta", "médico", "documento", "contacto", "telefone", "morada",
+    "especialidade", "serviço", "glaucoma", "catarata", "miopia", "astigmatismo",
+    "sintoma", "exame", "cirurgia", "olho", "visão", "óculos", "lente", "tempo",
+    "marcação", "seguro", "preço", "equipa", "corpo clínico", "doutor", "funcionamento"
+}
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", """És um classificador para um centro oftalmológico. Escolhe APENAS uma destas rotas:
+def classificar(pergunta: str) -> dict:
+    pergunta_lower = pergunta.lower().strip()
+    palavras = set(pergunta_lower.split())
 
-- "saudacao" → SÓ cumprimentos ou despedidas SEM nenhuma outra informação. Ex: "Olá", "Bom dia", "Obrigado", "Adeus".
-- "fora_do_escopo" → assuntos sem relação com oftalmologia ou o centro.
-- "rag" → TUDO o resto: perguntas, afirmações, pedidos, informações sobre o centro, saúde ocular, sintomas, exames, médicos, horários, contactos, etc.
+    # Se houver qualquer palavra informativa, é RAG (mesmo que tenha palavras de saudação)
+    if palavras & INFORMATIVAS:
+        return {"rota": "rag", "justificacao": "Contém palavras informativas"}
 
-Regra ABSOLUTA: se a frase menciona qualquer aspecto do centro ou saúde ocular → "rag". Mesmo que pareça uma afirmação ou uma despedida. Ex: "O centro funciona das 8h às 19h" → "rag".
+    # Se não tem informativas, mas é só saudação
+    if palavras.issubset(SAUDACAO_PURAS) or any(p in SAUDACAO_PURAS for p in palavras):
+        return {"rota": "saudacao", "justificacao": "Saudação pura"}
 
-Responde APENAS com JSON: {{"rota":"...", "justificacao":"..."}}"""),
-    ("user", "Frase: {pergunta}")
-])
+    # Se tem palavras de fora do escopo
+    if palavras & FORA_ESCOPO:
+        return {"rota": "fora_do_escopo", "justificacao": "Fora do escopo"}
 
-# Palavras que, se presentes, impedem a classificação como saudação
-PALAVRAS_INFORMATIVAS = [
-    "consulta", "tempo", "médico", "horário", "funcionamento", "marcação",
-    "documento", "contacto", "telefone", "morada", "especialidade", "serviço",
-    "glaucoma", "catarata", "miopia", "astigmatismo", "hipermetropia",
-    "sintoma", "exame", "cirurgia", "olho", "visão", "óculos", "lente"
-]
+    # Qualquer outra coisa vai para RAG
+    return {"rota": "rag", "justificacao": "Assunto geral"}
 
 async def classificador(state: AgenteState) -> AgenteState:
-    pergunta = state["mensagem_reformulada"].lower()
-    try:
-        resposta = await llm.ainvoke(prompt.format_messages(pergunta=pergunta))
-        rota = resposta.rota
-        justificacao = resposta.justificacao
-
-        # Blindagem: se a LLM escolheu "saudacao" mas a pergunta contém palavras informativas, força "rag"
-        if rota == "saudacao" and any(p in pergunta for p in PALAVRAS_INFORMATIVAS):
-            rota = "rag"
-            justificacao = "A frase contém palavras-chave informativas, forçando 'rag'."
-
-        state["classificacao"] = {"rota": rota, "justificacao": justificacao}
-        logger.info(f"Classificação: {rota} | {justificacao}")
-    except Exception as e:
-        logger.error(f"Erro no classificador: {traceback.format_exc()}")
-        state["classificacao"] = {"rota": "rag", "justificacao": "Erro na classificação"}
+    pergunta = state["mensagem_reformulada"]
+    state["classificacao"] = classificar(pergunta)
     return state

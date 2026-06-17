@@ -20,14 +20,13 @@ Regras INQUEBRÁVEIS:
 4. Não faças diagnósticos, não prescrevas medicamentos.
 5. Sê conciso e direto.
 6. Inclui o aviso "⚠️ Esta informação é apenas educativa. Consulte sempre um oftalmologista." apenas se o conteúdo for de saúde ocular.
-7. Se houver um documento cujo título corresponda claramente ao tema da pergunta, dá prioridade a esse documento na tua resposta."""),
+7. Se houver um documento cujo título corresponda exatamente ao tema da pergunta, usa ESSE documento como fonte principal, mesmo que outro tenha similaridade mais alta."""),
     ("user", "DOCUMENTOS:\n{documentos}\n\nPergunta: {pergunta}")
 ])
 
 async def rag(state: AgenteState) -> AgenteState:
     pergunta = state["mensagem_reformulada"]
     try:
-        # k=7 para melhor cobertura
         docs = buscar_documentos(pergunta, tipo=None, k=7, threshold=0.2)
         if not docs:
             state["resposta_final"] = "Não encontrei essa informação na nossa base de conhecimento. Posso ajudar com outra questão?"
