@@ -1,7 +1,7 @@
 """
-Busca vetorial personalizada com logging via loguru.
+Busca vetorial personalizada. Se tipo for None, não filtra por tipo.
 """
-from typing import List
+from typing import List, Optional
 from langchain_core.documents import Document
 from loguru import logger
 from app.db.supabase_client import supabase
@@ -11,18 +11,22 @@ embeddings = criar_embeddings()
 
 def buscar_documentos(
     query: str,
-    tipo: str,
+    tipo: Optional[str] = None,
     k: int = 5,
     threshold: float = 0.2
 ) -> List[Document]:
     try:
         vector = embeddings.embed_query(query)
+        filtro = {}
+        if tipo:
+            filtro = {"tipo": tipo}
+
         resultado = supabase.rpc(
             "match_documents",
             {
                 "query_embedding": vector,
                 "match_count": k,
-                "filter": {"tipo": tipo}
+                "filter": filtro
             }
         ).execute()
 
@@ -41,7 +45,7 @@ def buscar_documentos(
                     page_content=item["content"],
                     metadata=item["metadata"]
                 )
-                doc.metadata["similarity"] = similarity   # ← guardar similaridade
+                doc.metadata["similarity"] = similarity
                 docs.append(doc)
         return docs
 
