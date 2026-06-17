@@ -1,3 +1,7 @@
+"""
+Nó RAG único – busca em toda a base e geração restrita.
+k=7, instrução para priorizar o documento de título mais relevante.
+"""
 import traceback
 from loguru import logger
 from langchain_core.prompts import ChatPromptTemplate
@@ -15,15 +19,16 @@ Regras INQUEBRÁVEIS:
 3. Se a informação não estiver nos DOCUMENTOS, diz: "Não encontrei essa informação na nossa base de conhecimento. Posso ajudar com outra questão?"
 4. Não faças diagnósticos, não prescrevas medicamentos.
 5. Sê conciso e direto.
-6. Inclui o aviso "⚠️ Esta informação é apenas educativa. Consulte sempre um oftalmologista." apenas se o conteúdo for de saúde ocular."""),
+6. Inclui o aviso "⚠️ Esta informação é apenas educativa. Consulte sempre um oftalmologista." apenas se o conteúdo for de saúde ocular.
+7. Se houver um documento cujo título corresponda claramente ao tema da pergunta, dá prioridade a esse documento na tua resposta."""),
     ("user", "DOCUMENTOS:\n{documentos}\n\nPergunta: {pergunta}")
 ])
 
 async def rag(state: AgenteState) -> AgenteState:
     pergunta = state["mensagem_reformulada"]
     try:
-        # Busca sem filtrar por tipo (toda a base)
-        docs = buscar_documentos(pergunta, tipo=None, k=5, threshold=0.2)
+        # k=7 para melhor cobertura
+        docs = buscar_documentos(pergunta, tipo=None, k=7, threshold=0.2)
         if not docs:
             state["resposta_final"] = "Não encontrei essa informação na nossa base de conhecimento. Posso ajudar com outra questão?"
             return state

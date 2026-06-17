@@ -1,5 +1,5 @@
 """
-Nó 3 – Classificador de intenções (3 rotas, prompt cirúrgico)
+Nó 3 – Classificador de intenções (3 rotas) com blindagem anti‑falsas saudações
 """
 import traceback
 from loguru import logger
@@ -16,18 +16,34 @@ prompt = ChatPromptTemplate.from_messages([
 - "fora_do_escopo" → assuntos sem relação com oftalmologia ou o centro.
 - "rag" → TUDO o resto: perguntas, afirmações, pedidos, informações sobre o centro, saúde ocular, sintomas, exames, médicos, horários, contactos, etc.
 
-Regra ABSOLUTA: se a frase menciona qualquer aspecto do centro ou saúde ocular → "rag". Mesmo que pareça uma afirmação. Ex: "O centro funciona das 8h às 19h" → "rag".
+Regra ABSOLUTA: se a frase menciona qualquer aspecto do centro ou saúde ocular → "rag". Mesmo que pareça uma afirmação ou uma despedida. Ex: "O centro funciona das 8h às 19h" → "rag".
 
 Responde APENAS com JSON: {{"rota":"...", "justificacao":"..."}}"""),
     ("user", "Frase: {pergunta}")
 ])
 
+# Palavras que, se presentes, impedem a classificação como saudação
+PALAVRAS_INFORMATIVAS = [
+    "consulta", "tempo", "médico", "horário", "funcionamento", "marcação",
+    "documento", "contacto", "telefone", "morada", "especialidade", "serviço",
+    "glaucoma", "catarata", "miopia", "astigmatismo", "hipermetropia",
+    "sintoma", "exame", "cirurgia", "olho", "visão", "óculos", "lente"
+]
+
 async def classificador(state: AgenteState) -> AgenteState:
-    pergunta = state["mensagem_reformulada"]
+    pergunta = state["mensagem_reformulada"].lower()
     try:
         resposta = await llm.ainvoke(prompt.format_messages(pergunta=pergunta))
-        state["classificacao"] = {"rota": resposta.rota, "justificacao": resposta.justificacao}
-        logger.info(f"Classificação: {resposta.rota} | {resposta.justificacao}")
+        rota = resposta.rota
+        justificacao = resposta.justificacao
+
+        # Blindagem: se a LLM escolheu "saudacao" mas a pergunta contém palavras informativas, força "rag"
+        if rota == "saudacao" and any(p in pergunta for p in PALAVRAS_INFORMATIVAS):
+            rota = "rag"
+            justificacao = "A frase contém palavras-chave informativas, forçando 'rag'."
+
+        state["classificacao"] = {"rota": rota, "justificacao": justificacao}
+        logger.info(f"Classificação: {rota} | {justificacao}")
     except Exception as e:
         logger.error(f"Erro no classificador: {traceback.format_exc()}")
         state["classificacao"] = {"rota": "rag", "justificacao": "Erro na classificação"}
