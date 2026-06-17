@@ -1,7 +1,7 @@
 """
 Nó 6 - RAG Médico
-Estratégia híbrida: resposta direta do documento para similaridade alta,
-fallback para LLM apenas quando necessário.
+Estratégia híbrida: resposta direta do documento para similaridade alta (≥0.7),
+concatenação de documentos complementares, fallback para LLM apenas em casos duvidosos.
 """
 import traceback
 from loguru import logger
@@ -15,7 +15,7 @@ DISCLAIMER = "\n\n⚠️ Esta informação é apenas educativa. Consulte sempre 
 async def rag_medico(state: AgenteState) -> AgenteState:
     pergunta = state["mensagem_reformulada"]
     try:
-        docs = buscar_documentos(pergunta, tipo="medico", k=5, threshold=0.2)
+        docs = buscar_documentos(pergunta, tipo="medico", k=7, threshold=0.2)
         if not docs:
             state["resposta_final"] = "Não encontrei informação suficiente na nossa base de conhecimento. Recomendo uma consulta com um oftalmologista."
             return state
@@ -25,19 +25,19 @@ async def rag_medico(state: AgenteState) -> AgenteState:
         top_doc = docs[0]
         top_similarity = top_doc.metadata.get("similarity", 0)
 
-        # Resposta determinística para similaridade alta (>=0.8)
-        if top_similarity >= 0.8:
+        # Resposta determinística para similaridade ≥ 0.7
+        if top_similarity >= 0.7:
             resposta = top_doc.page_content
-            # Se houver um segundo documento com similaridade alta e próxima (diferença <= 0.1), juntar ambos
+            # Concatenação: se existir um 2º documento com sim ≥ 0.65 e diferença ≤ 0.15
             if len(docs) > 1:
                 second_sim = docs[1].metadata.get("similarity", 0)
-                if second_sim >= 0.7 and (top_similarity - second_sim) <= 0.1:
+                if second_sim >= 0.65 and (top_similarity - second_sim) <= 0.15:
                     resposta += "\n\n" + docs[1].page_content
             state["resposta_final"] = resposta + DISCLAIMER
-            logger.info(f"RAG Médico determinístico: doc(s) usados com sim {top_similarity:.4f}")
+            logger.info(f"RAG Médico determinístico: top sim {top_similarity:.4f}")
             return state
 
-        # Fallback para LLM apenas se similaridade for inferior a 0.8
+        # Fallback para LLM apenas se similaridade for inferior a 0.7
         llm = criar_llm()
         prompt = ChatPromptTemplate.from_messages([
             ("system", "Utiliza exclusivamente os documentos fornecidos. Se não houver resposta exata, diz que não sabes. Inclui o disclaimer no final."),
